@@ -1,0 +1,55 @@
+---
+- name: Template java.service systemd
+  ansible.builtin.template:
+    src: templates/java.service.j2
+    dest: /lib/systemd/system/java.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+- name: Copy file rsyslog for java service
+  ansible.builtin.copy:
+    src: files/java-syslog.conf
+    dest: /etc/rsyslog.d/java-syslog.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+- name: Copy file java logrotate service
+  ansible.builtin.copy:
+    src: files/java-logrotate
+    dest: /etc/logrotate.d/java-logrotate
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+- name: Template nginx java service and restart nginx with handlers
+  ansible.builtin.template:
+    src: templates/java.conf.j2
+    dest: /etc/nginx/conf.d/java.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  notify:
+  - restart nginx
+- name: Force systemd to reload
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  become: yes
+- name: Force systemd to restart rsyslog for java service log
+  ansible.builtin.systemd:
+    state: restarted
+    name: syslog
+  become: yes
+- name: restart and enable java service
+  ansible.builtin.systemd:
+    state: restarted
+    name: java
+    enabled: yes
+  become: yes
+- name: Refresh logrotate java log
+  shell: logrotate -vf /etc/logrotate.d/java-logrotate
+  args:
+    executable: /bin/bash
+  become: yes

@@ -1,0 +1,15 @@
+[Unit]
+Description=java
+After=network.target
+
+[Service]
+User={{ ansible_user }}
+WorkingDirectory=/home/{{ ansible_user }}
+ExecStart=/usr/bin/java -jar /home/{{ ansible_user }}/deploy/simple-application.jar server /home/{{ ansible_user }}/deploy/simple.yml
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=java
+
+[Install]
+WantedBy=multi-user.target

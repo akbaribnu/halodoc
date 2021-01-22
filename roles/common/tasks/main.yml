@@ -1,0 +1,19 @@
+---
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+  become: yes
+- name: install nginx and other depedency
+  apt:
+    name:
+      - nginx
+      - net-tools
+      - openjdk-8-jdk
+      - openjdk-8-jre
+    state: present
+  become: yes
+- name: Set timezone to Asia/Jakarta
+  shell: timedatectl set-timezone Asia/Jakarta
+  args:
+    executable: /bin/bash
+  become: yes

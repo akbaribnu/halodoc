@@ -1,0 +1,6 @@
+---
+- name: java devops
+  hosts: java
+  roles:
+    - common
+    - apps
